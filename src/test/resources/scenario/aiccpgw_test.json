@@ -1,0 +1,17 @@
+{
+  "name": "aiccpgw_test",
+  "scenarios" : {
+    "1": {
+      "expectedFile": "/Users/jamesj/GIT_PROJECTS/UANGEL/ucheck/ucheck/src/test/resources/validation/expected/sip_stack_uac.log",
+      "actualFile": "/Users/jamesj/GIT_PROJECTS/UANGEL/ucheck/ucheck/src/test/resources/validation/actual/sip_stack_uac.log"
+    },
+    "2": {
+      "expectedFile": "/Users/jamesj/GIT_PROJECTS/UANGEL/ucheck/ucheck/src/test/resources/validation/expected/sip_stack_uas.log",
+      "actualFile": "/Users/jamesj/GIT_PROJECTS/UANGEL/ucheck/ucheck/src/test/resources/validation/actual/sip_stack_uas.log"
+    },
+    "3": {
+      "expectedFile": "/Users/jamesj/GIT_PROJECTS/UANGEL/ucheck/ucheck/src/test/resources/validation/expected/test1.txt",
+      "actualFile": "/Users/jamesj/GIT_PROJECTS/UANGEL/ucheck/ucheck/src/test/resources/validation/actual/test1.txt"
+    }
+  }
+}
