@@ -40,13 +40,9 @@ public class ScenarioHandler extends JobContainer {
                 // 2) Compare them line by line
                 // 2-1) Check total line number
                 int actualFileTotalLineNumber = fileManager.getTotalLineNumber(actualFileName);
-                int expectedFileTotalLineNumber = fileManager.getTotalLineNumber(expectedFileName);
-                if (actualFileTotalLineNumber != expectedFileTotalLineNumber) {
-                    scenario.setSuccess(false);
-                    return;
-                }
 
                 // 2-2) Check lines
+                int wrongCount = 0;
                 int lineNumber = 1;
                 for (; lineNumber <= actualFileTotalLineNumber; lineNumber++) {
                     scenario.setCurLineNumber(lineNumber);
@@ -63,24 +59,24 @@ public class ScenarioHandler extends JobContainer {
 
                     String expectedLine = fileManager.getLineByNumber(lineNumber, expectedFileName);
 
-                    log.trace("----------------------");
-                    log.trace("[{}] [A] [ {} ]", scenario.getId(), actualLine);
-                    log.trace("[{}] [E] [ {} ]", scenario.getId(), expectedLine);
+                    log.debug("----------------------");
+                    log.debug("[{}] [A] [ {} ]", scenario.getId(), actualLine);
+                    log.debug("[{}] [E] [ {} ]", scenario.getId(), expectedLine);
 
                     // 1) actual: null or "" & expected: "~"
                     if ((actualLine == null || actualLine.isEmpty())
                             && (expectedLine != null && !expectedLine.isEmpty())) {
-                        break;
+                        wrongCount++;
                     }
                     // 2) actual: "~" & expected: null or ""
                     else if ((actualLine != null && !actualLine.isEmpty())
                             && (expectedLine == null || expectedLine.isEmpty())) {
-                        break;
+                        wrongCount++;
                     }
                     // 3) actual: "@" & expected: "#"
                     else if (actualLine != null && !actualLine.equals(expectedLine)) {
                         log.warn("[{}] [!]\n[ E: {} ] <> \n[ A: {} ]", scenario.getId(), expectedLine, actualLine);
-                        break;
+                        wrongCount++;
                     }
 
                     // File IO 과부하 방지
@@ -88,7 +84,7 @@ public class ScenarioHandler extends JobContainer {
                 }
 
                 // 3) Apply result
-                scenario.setSuccess((lineNumber - 1) == actualFileTotalLineNumber);
+                scenario.setSuccess(wrongCount);
             } catch (Exception e) {
                 log.warn("[{}] [{}] Exception", scenario.getId(), getJob().getName(), e);
             } finally {

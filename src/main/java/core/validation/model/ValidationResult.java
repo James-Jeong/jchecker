@@ -22,8 +22,8 @@ public class ValidationResult {
         this.totalScenarioCount.incrementAndGet();
     }
 
-    public void apply(String id, boolean isSuccess) {
-        results.putIfAbsent(id, isSuccess);
+    public void apply(String id, ValidationResultDto validationResultDto) {
+        results.putIfAbsent(id, validationResultDto);
     }
 
     public String getResults() {

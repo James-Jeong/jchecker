@@ -8,6 +8,7 @@ import core.validation.Validator;
 import core.validation.handler.ScenarioHandler;
 import core.validation.model.ValidationModel;
 import core.validation.model.ValidationModelBuilder;
+import core.validation.model.ValidationResultDto;
 import core.validation.scenario.model.CaseDto;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class Scenario {
 
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
     private boolean isSuccess = false;
+    private int wrongCount = 0;
 
     public Scenario(Validator validator,
                     ScheduleManager scheduleManager, String scheduleKey,
@@ -84,9 +86,15 @@ public class Scenario {
         return isSuccess;
     }
 
-    public void setSuccess(boolean success) {
-        isSuccess = success;
-        validator.getValidationResult().apply(id, isSuccess);
+    public void setSuccess(int wrongCount) {
+        this.wrongCount = wrongCount;
+        isSuccess = wrongCount == 0;
+        validator.getValidationResult().apply(
+                id,
+                new ValidationResultDto(
+                        isSuccess, wrongCount
+                )
+        );
     }
 
     public boolean start() {
@@ -141,6 +149,7 @@ public class Scenario {
                 ", curLineNumber=" + curLineNumber +
                 ", isStarted=" + isStarted +
                 ", isSuccess=" + isSuccess +
+                ", wrongCount=" + wrongCount +
                 '}';
     }
 }
