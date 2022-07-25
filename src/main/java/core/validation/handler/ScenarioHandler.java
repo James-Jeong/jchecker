@@ -59,9 +59,8 @@ public class ScenarioHandler extends JobContainer {
 
                     String expectedLine = fileManager.getLineByNumber(lineNumber, expectedFileName);
 
-                    log.debug("----------------------");
-                    log.debug("[{}] [A] [ {} ]", scenario.getId(), actualLine);
-                    log.debug("[{}] [E] [ {} ]", scenario.getId(), expectedLine);
+                    //log.debug("[{}] [A] [ {} ]", scenario.getId(), actualLine);
+                    //log.debug("[{}] [E] [ {} ]", scenario.getId(), expectedLine);
 
                     // 1) actual: null or "" & expected: "~"
                     if ((actualLine == null || actualLine.isEmpty())
