@@ -75,7 +75,7 @@ public class ScenarioHandler extends JobContainer {
                     }
                     // 3) actual: "@" & expected: "#"
                     else if (actualLine != null && !actualLine.equals(expectedLine)) {
-                        log.warn("[{}] [!]\n[ E: {} ] <> \n[ A: {} ]", scenario.getId(), expectedLine, actualLine);
+                        log.warn("[{}] [! {}]\n[ E: {} ] <> \n[ A: {} ]", scenario.getId(), lineNumber, expectedLine, actualLine);
                         wrongCount++;
                     }
 

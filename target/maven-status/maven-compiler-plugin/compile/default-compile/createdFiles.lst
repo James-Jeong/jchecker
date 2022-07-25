@@ -24,6 +24,7 @@ core/validation/scenario/Scenario.class
 core/scheduler/schedule/ScheduleManager.class
 core/validation/handler/ScenarioHandler.class
 core/config/ConfigManager.class
+core/validation/model/ValidationResultDto.class
 core/scheduler/job/JobContainer.class
 core/util/ScenarioParser.class
 core/validation/repository/ScenarioRepositoryFactory.class
