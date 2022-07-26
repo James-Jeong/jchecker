@@ -74,8 +74,8 @@ public class ScenarioHandler extends JobContainer {
                         // Check Discard Keyword
                         boolean isSkipped = false;
                         for (String discardKeyword : discardKeywords) {
-                            if (actualLine.contains(discardKeyword)
-                                    || expectedLine.contains(discardKeyword)) {
+                            if (fileManager.isContained(actualLine, discardKeyword)
+                                    || fileManager.isContained(expectedLine, discardKeyword)) {
                                 isSkipped = true;
                                 break;
                             }
@@ -84,10 +84,10 @@ public class ScenarioHandler extends JobContainer {
 
                         // Check equality
                         if (!actualLine.equals(expectedLine)) {
-                            log.warn("[{}] [!]\n[ E({}): {} ] <> \n[ A({}): {} ]",
+                            log.warn("[{}] [!]\n[ E ({}) : {} ] <-> \n[ A ({}) : {} ]",
                                     scenario.getId(),
-                                    expectedLineNumber, expectedLine,
-                                    expectedLineNumber, actualLine
+                                    expectedLineNumber + 1, expectedLine,
+                                    expectedLineNumber + 1, actualLine
                             );
                             wrongCount++;
                         }

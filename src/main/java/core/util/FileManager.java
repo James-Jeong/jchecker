@@ -7,6 +7,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -76,13 +77,13 @@ public class FileManager {
     }
 
     public String getLineByNumber(int lineNumber, String fileName) {
-        if (lineNumber <= 0) { return null; }
+        if (lineNumber < 0) { return null; }
 
         File file = new File(fileName);
         Path path = file.toPath();
 
         try (Stream<String> fileStream = Files.lines(path)) {
-            return fileStream.skip(lineNumber - 1).findFirst().orElse(null);
+            return fileStream.skip(lineNumber).findFirst().orElse(null);
         } catch (Exception e) {
             return null;
         }
@@ -122,8 +123,9 @@ public class FileManager {
         }
     }
 
-    public boolean trimFile(String fileName) {
-        String fileContent = readAllToString(fileName);
+    public boolean trimFile(String fileName) throws IOException {
+        byte[] bytes = Files.readAllBytes(Paths.get(fileName));
+        String fileContent = new String(bytes);
         if (isEmptyString(fileContent)) { return false; }
 
         fileContent = trimLine(fileContent);
@@ -131,12 +133,15 @@ public class FileManager {
     }
 
     public String trimLine(String line) {
-        line = line.replaceAll("(^M)", "\n").trim();
-        return line.replaceAll("(\r\n|\r|\n\r)", "\n").trim();
+        return line.replaceAll("\\r\\n?", "\n").trim();
     }
 
     public boolean isEmptyString(String line) {
         return (line == null) || line.isEmpty();
+    }
+
+    public boolean isContained(String line, String keyword) {
+        return line.lastIndexOf(keyword) >= 0;
     }
 
 }
