@@ -28,6 +28,7 @@ public class ScenarioHandler extends JobContainer {
 
     public void start(Scenario scenario) {
         getJob().setRunnable(() -> {
+            int wrongCount = 0;
             try {
                 FileManager fileManager = scenario.getFileManager();
                 ValidationModel actualModel = scenario.getActualModel();
@@ -35,58 +36,71 @@ public class ScenarioHandler extends JobContainer {
 
                 // 1) Get contents from scenario (expectedContent, actualContent)
                 String actualFileName = actualModel.getFileName();
+                if (!fileManager.trimFile(actualFileName)) {
+                    log.warn("[{}] Fail to trim the file. ({})", scenario.getId(), actualFileName);
+                    return;
+                }
+
                 String expectedFileName = expectedModel.getFileName();
+                if (!fileManager.trimFile(expectedFileName)) {
+                    log.warn("[{}] Fail to trim the file. ({})", scenario.getId(), expectedFileName);
+                    return;
+                }
 
-                // 2) Compare them line by line
-                // 2-1) Check total line number
-                int actualFileTotalLineNumber = fileManager.getTotalLineNumber(actualFileName);
+                // 2) Compare line by line
+                int expectedFileTotalLineNumber = fileManager.getTotalLineNumber(expectedFileName);
+                int expectedLineNumber = 0;
+                for (; expectedLineNumber <= expectedFileTotalLineNumber; expectedLineNumber++) {
+                    scenario.setCurLineNumber(expectedLineNumber);
 
-                // 2-2) Check lines
-                int wrongCount = 0;
-                int lineNumber = 1;
-                for (; lineNumber <= actualFileTotalLineNumber; lineNumber++) {
-                    scenario.setCurLineNumber(lineNumber);
-
-                    String actualLine = fileManager.getLineByNumber(lineNumber, actualFileName);
-                    boolean isSkipped = false;
-                    for (String discardKeyword : discardKeywords) {
-                        if (actualLine.contains(discardKeyword)) {
-                            isSkipped = true;
-                            break;
-                        }
-                    }
-                    if (isSkipped) { continue; }
-
-                    String expectedLine = fileManager.getLineByNumber(lineNumber, expectedFileName);
+                    String expectedLine = fileManager.getLineByNumber(expectedLineNumber, expectedFileName);
+                    String actualLine = fileManager.getLineByNumber(expectedLineNumber, actualFileName);
 
                     //log.debug("[{}] [A] [ {} ]", scenario.getId(), actualLine);
                     //log.debug("[{}] [E] [ {} ]", scenario.getId(), expectedLine);
 
-                    // 1) actual: null or "" & expected: "~"
-                    if ((actualLine == null || actualLine.isEmpty())
-                            && (expectedLine != null && !expectedLine.isEmpty())) {
+                    // 1) actual: "@" & expected: null or "" > Wrong
+                    if (fileManager.isEmptyString(actualLine) && !fileManager.isEmptyString(expectedLine)) {
                         wrongCount++;
+                        continue;
                     }
-                    // 2) actual: "~" & expected: null or ""
-                    else if ((actualLine != null && !actualLine.isEmpty())
-                            && (expectedLine == null || expectedLine.isEmpty())) {
+                    // 2) actual: null or "" & expected: "#" > Wrong
+                    else if (!fileManager.isEmptyString(actualLine) && fileManager.isEmptyString(expectedLine)) {
                         wrongCount++;
+                        continue;
                     }
-                    // 3) actual: "@" & expected: "#"
-                    else if (actualLine != null && !actualLine.equals(expectedLine)) {
-                        log.warn("[{}] [! {}]\n[ E: {} ] <> \n[ A: {} ]", scenario.getId(), lineNumber, expectedLine, actualLine);
-                        wrongCount++;
+                    // 3) actual: "@" & expected: "#" > Check
+                    else if (!fileManager.isEmptyString(actualLine) && !fileManager.isEmptyString(expectedLine)) {
+                        // Check Discard Keyword
+                        boolean isSkipped = false;
+                        for (String discardKeyword : discardKeywords) {
+                            if (actualLine.contains(discardKeyword)
+                                    || expectedLine.contains(discardKeyword)) {
+                                isSkipped = true;
+                                break;
+                            }
+                        }
+                        if (isSkipped) { continue; }
+
+                        // Check equality
+                        if (!actualLine.equals(expectedLine)) {
+                            log.warn("[{}] [!]\n[ E({}): {} ] <> \n[ A({}): {} ]",
+                                    scenario.getId(),
+                                    expectedLineNumber, expectedLine,
+                                    expectedLineNumber, actualLine
+                            );
+                            wrongCount++;
+                        }
                     }
 
                     // File IO 과부하 방지
                     TimeUtil.sleep(10, TimeUnit.MILLISECONDS);
                 }
-
-                // 3) Apply result
-                scenario.setSuccess(wrongCount);
             } catch (Exception e) {
                 log.warn("[{}] [{}] Exception", scenario.getId(), getJob().getName(), e);
             } finally {
+                // 3) Apply result
+                scenario.setSuccess(wrongCount);
                 if (validator.removeScenario(scenario.getId())) {
                     log.debug("[{}] [{}] Success to finish the scenario.", scenario.getId(), getJob().getName());
                 }

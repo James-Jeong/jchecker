@@ -13,27 +13,27 @@ import java.util.stream.Stream;
 public class FileManager {
 
     public File createFile(String fileName) {
-        if (fileName == null) { return null; }
+        if (isEmptyString(fileName)) { return null; }
 
         return new File(fileName);
     }
 
     public boolean isExist(String fileName) {
-        if (fileName == null) { return false; }
+        if (isEmptyString((fileName))) { return false; }
 
         File file = new File(fileName);
         return file.exists();
     }
 
     public boolean mkdirs(String fileName) {
-        if (fileName == null) { return false; }
+        if (isEmptyString(fileName)) { return false; }
 
         File file = new File(fileName);
         return file.mkdirs();
     }
 
     public boolean writeString(String fileName, String data, boolean isAppend) {
-        if (fileName == null) { return false; }
+        if (isEmptyString(fileName)) { return false; }
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, isAppend))) {
             bufferedWriter.write(data);
@@ -45,11 +45,17 @@ public class FileManager {
     }
 
     public String readAllToString(String fileName) {
-        if (fileName == null) { return null; }
+        if (isEmptyString(fileName)) { return null; }
 
         try {
             Path path = Paths.get(fileName);
-            return Files.readString(path);
+
+            StringBuilder result = new StringBuilder();
+            for (String line : Files.readAllLines(path)) {
+                result.append(line);
+            }
+
+            return result.toString();
         } catch (Exception e) {
             log.warn("[FileManager] Fail to read the file. (fileName={})", fileName);
             return null;
@@ -72,8 +78,11 @@ public class FileManager {
     public String getLineByNumber(int lineNumber, String fileName) {
         if (lineNumber <= 0) { return null; }
 
-        try (Stream<String> fileStream = Files.lines(Path.of(fileName))) {
-            return fileStream.skip(lineNumber - 1).findFirst().get();
+        File file = new File(fileName);
+        Path path = file.toPath();
+
+        try (Stream<String> fileStream = Files.lines(path)) {
+            return fileStream.skip(lineNumber - 1).findFirst().orElse(null);
         } catch (Exception e) {
             return null;
         }
@@ -111,6 +120,23 @@ public class FileManager {
         } catch (Exception e) {
             log.warn("[FileManager] Fail to delete the file. (path={})", file.getAbsolutePath(), e);
         }
+    }
+
+    public boolean trimFile(String fileName) {
+        String fileContent = readAllToString(fileName);
+        if (isEmptyString(fileContent)) { return false; }
+
+        fileContent = trimLine(fileContent);
+        return writeString(fileName, fileContent, false);
+    }
+
+    public String trimLine(String line) {
+        line = line.replaceAll("(^M)", "\n").trim();
+        return line.replaceAll("(\r\n|\r|\n\r)", "\n").trim();
+    }
+
+    public boolean isEmptyString(String line) {
+        return (line == null) || line.isEmpty();
     }
 
 }
