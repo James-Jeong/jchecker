@@ -59,7 +59,7 @@ public class ScenarioHandler extends JobContainer {
                     //log.debug("[{}] [A] [ {} ]", scenario.getId(), actualLine);
                     //log.debug("[{}] [E] [ {} ]", scenario.getId(), expectedLine);
 
-                    // 1) actual: "@" & expected: null or "" > Wrong
+                    /*// 1) actual: "@" & expected: null or "" > Wrong
                     if (fileManager.isEmptyString(actualLine) && !fileManager.isEmptyString(expectedLine)) {
                         wrongCount++;
                         continue;
@@ -68,9 +68,9 @@ public class ScenarioHandler extends JobContainer {
                     else if (!fileManager.isEmptyString(actualLine) && fileManager.isEmptyString(expectedLine)) {
                         wrongCount++;
                         continue;
-                    }
+                    }*/
                     // 3) actual: "@" & expected: "#" > Check
-                    else if (!fileManager.isEmptyString(actualLine) && !fileManager.isEmptyString(expectedLine)) {
+                    /*else */if (!fileManager.isEmptyString(actualLine) && !fileManager.isEmptyString(expectedLine)) {
                         // Check Discard Keyword
                         boolean isSkipped = false;
                         for (String discardKeyword : discardKeywords) {
