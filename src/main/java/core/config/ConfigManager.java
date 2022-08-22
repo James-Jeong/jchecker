@@ -11,10 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-/**
- * @class public class UserConfig
- * @brief UserConfig Class
- */
 @Data
 public class ConfigManager {
 
@@ -33,7 +29,8 @@ public class ConfigManager {
 
     ////////////////////////////////////////////////////////////
     // Section String
-    public static final String SECTION_COMMON = "COMMON"; // COMMON Section 이름
+    public static final String SECTION_COMMON = "COMMON";
+    public static final String SECTION_NOTI = "NOTI";
     ////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////
@@ -43,6 +40,7 @@ public class ConfigManager {
     public static final String FIELD_THREAD_POOL_SIZE = "THREAD_POOL_SIZE";
     public static final String FIELD_RESULT_FILE_PATH = "RESULT_FILE_PATH";
     public static final String FIELD_DISCARD_KEYWORDS = "DISCARD_KEYWORDS";
+    public static final String FIELD_NOTI_URL = "URL";
     ////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////
@@ -52,6 +50,7 @@ public class ConfigManager {
     private int threadPoolSize = 0;
     private String resultFilePath = null;
     private final List<String> discardKeywords = new ArrayList<>();
+    private String notiUrl = null;
     ////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -72,6 +71,7 @@ public class ConfigManager {
             this.ini = new Ini(iniFile);
 
             loadCommonConfig();
+            loadNotiConfig();
 
             logger.info("Load config [{}]", configPath);
         } catch (IOException e) {
@@ -115,34 +115,12 @@ public class ConfigManager {
         logger.debug(CONSTANT_PRINT_SUCCESS_LOG_FORMAT, SECTION_COMMON);
     }
 
-    ////////////////////////////////////////////////////////////////////////////////
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public int getThreadPoolSize() {
-        return threadPoolSize;
-    }
-
-    public void setThreadPoolSize(int threadPoolSize) {
-        this.threadPoolSize = threadPoolSize;
-    }
-
-    public String getResultFilePath() {
-        return resultFilePath;
-    }
-
-    public void setResultFilePath(String resultFilePath) {
-        this.resultFilePath = resultFilePath;
-    }
-
-    public List<String> getDiscardKeywords() {
-        return discardKeywords;
+    private void loadNotiConfig() {
+        this.notiUrl = getIniValue(SECTION_NOTI, FIELD_NOTI_URL);
+        if (this.notiUrl == null) {
+            logger.error(CONSTANT_PRINT_FAIL_LOG_FORMAT_1, SECTION_NOTI, FIELD_NOTI_URL);
+            System.exit(1);
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////

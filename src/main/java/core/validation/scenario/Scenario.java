@@ -35,7 +35,8 @@ public class Scenario {
     public Scenario(Validator validator,
                     ScheduleManager scheduleManager, String scheduleKey,
                     String id, CaseDto caseDto,
-                    List<String> discardKeywords) {
+                    List<String> discardKeywords,
+                    String notiUrl) {
         this.validator = validator;
         this.scheduleKey = scheduleKey;
         this.id = id;
@@ -63,7 +64,7 @@ public class Scenario {
                 .setTotalRunCount(1)
                 .setIsLasted(false)
                 .build();
-        this.scenarioHandler = new ScenarioHandler(validator, scenarioHandleJob, discardKeywords);
+        this.scenarioHandler = new ScenarioHandler(validator, scenarioHandleJob, discardKeywords, notiUrl);
     }
 
     public Validator getValidator() {

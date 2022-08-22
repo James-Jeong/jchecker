@@ -87,7 +87,8 @@ public class ServiceManager {
                         validator,
                         scheduleManager, MAIN_SCHEDULE_JOB,
                         key, caseDto,
-                        configManager.getDiscardKeywords()
+                        configManager.getDiscardKeywords(),
+                        configManager.getNotiUrl().trim()
                 );
                 if (validator.addScenario(scenario)) {
                     validator.getValidationResult().incAndGetTotalScenarioCount();
