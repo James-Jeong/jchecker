@@ -11,6 +11,7 @@ core/validation/model/ValidationModelBuilder.class
 core/validation/scenario/model/ScenarioDto.class
 core/validation/model/ValidationModel.class
 core/scheduler/job/JobBuilder.class
+core/network/ResultNotiSender.class
 core/scheduler/schedule/unit/ScheduleUnit.class
 core/scheduler/schedule/handler/JobExecutor.class
 core/util/FileManager.class

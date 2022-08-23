@@ -1,7 +1,6 @@
 package core.validation.handler;
 
 import core.config.ConfigManager;
-import core.network.ResultNotiSender;
 import core.scheduler.job.Job;
 import core.scheduler.job.JobContainer;
 import core.service.ServiceManager;
@@ -20,13 +19,10 @@ public class ScenarioHandler extends JobContainer {
 
     private final Validator validator;
     private final List<String> discardKeywords;
-    private final String notiUrl;
 
-    public ScenarioHandler(Validator validator, Job scenarioHandleJob, List<String> discardKeywords, String notiUrl) {
+    public ScenarioHandler(Validator validator, Job scenarioHandleJob, List<String> discardKeywords) {
         this.validator = validator;
         this.discardKeywords = discardKeywords;
-        this.notiUrl = notiUrl;
-
         setJob(scenarioHandleJob);
     }
 
@@ -107,13 +103,6 @@ public class ScenarioHandler extends JobContainer {
                 scenario.setSuccess(wrongCount);
                 if (validator.removeScenario(scenario.getId())) {
                     log.debug("[{}] [{}] Success to finish the scenario.", scenario.getId(), getJob().getName());
-
-                    try {
-                        ResultNotiSender resultNotiSender = new ResultNotiSender(notiUrl);
-                        resultNotiSender.send(scenario.getValidator().getValidationResult().getResults());
-                    } catch (Exception e) {
-                        log.warn("[{}] [{}] Fail to send the noti to [{}]", scenario.getId(), getJob().getName(), notiUrl, e);
-                    }
                 }
             }
         });

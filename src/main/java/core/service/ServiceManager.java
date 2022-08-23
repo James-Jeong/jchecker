@@ -1,6 +1,7 @@
 package core.service;
 
 import core.config.ConfigManager;
+import core.network.ResultNotiSender;
 import core.scheduler.schedule.ScheduleManager;
 import core.util.ScenarioParser;
 import core.util.TimeUtil;
@@ -87,8 +88,7 @@ public class ServiceManager {
                         validator,
                         scheduleManager, MAIN_SCHEDULE_JOB,
                         key, caseDto,
-                        configManager.getDiscardKeywords(),
-                        configManager.getNotiUrl().trim()
+                        configManager.getDiscardKeywords()
                 );
                 if (validator.addScenario(scenario)) {
                     validator.getValidationResult().incAndGetTotalScenarioCount();
@@ -104,6 +104,15 @@ public class ServiceManager {
 
         log.info("[RESULT]\n{}", validator.getValidationResult().getResults());
         validator.getValidationResult().save(configManager.getResultFilePath());
+
+        // NOTIFY VALIDATION RESULT
+        String notiUrl = configManager.getNotiUrl().trim();
+        try {
+            ResultNotiSender resultNotiSender = new ResultNotiSender(notiUrl);
+            resultNotiSender.send(validator.getValidationResult().getResults());
+        } catch (Exception e) {
+            log.warn("Fail to send the noti to [{}]", notiUrl, e);
+        }
 
         systemUnLock();
         log.info("[UCHECK] STOP");
